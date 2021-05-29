@@ -5,7 +5,8 @@ from moonMS import settings
 
 class Lab(models.Model):
     name = models.CharField(max_length=255)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='labs')
     description = models.TextField()
 
     def __str__(self):

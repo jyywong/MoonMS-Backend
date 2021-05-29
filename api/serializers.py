@@ -1,12 +1,16 @@
+from django.db.models import query
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 from .models import Lab, LabInvite, Inventory, Item, ItemBatch, ItemNotices, ItemOrder, ItemActivityLog
 from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    labs = PrimaryKeyRelatedField(many=True, queryset=Lab.members)
+
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'labs']
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -38,9 +42,12 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class LabSerializer(serializers.ModelSerializer):
+    inventories = serializers.PrimaryKeyRelatedField(source="inventory",
+                                                     many=True, queryset=Inventory.objects.all())
+
     class Meta:
         model = Lab
-        fields = ['id', 'name', 'members', 'description']
+        fields = ['id', 'name', 'members', 'description', 'inventories']
 
 
 class LabInviteSerializer(serializers.ModelSerializer):
@@ -50,19 +57,30 @@ class LabInviteSerializer(serializers.ModelSerializer):
 
 
 class InventorySerializer(serializers.ModelSerializer):
+    labID = serializers.PrimaryKeyRelatedField(
+        source="lab", queryset=Lab.objects.all())
+    items = serializers.PrimaryKeyRelatedField(
+        source="item", many=True, queryset=Item.objects.all())
+
     class Meta:
         model = Inventory
-        fields = ['id', 'lab', 'name', 'description']
+        fields = ['id', 'labID', 'name', 'description', 'items']
 
 
 class ItemSerializer(serializers.ModelSerializer):
+    invID = serializers.PrimaryKeyRelatedField(
+        source="inventory", queryset=Item.objects.all())
+    notices = serializers.PrimaryKeyRelatedField(
+        source="itemNotices", many=True, queryset=ItemNotices.objects.all())
+
     class Meta:
         model = Item
-        fields = ['inventory', 'name', 'manufacturer',
-                  'notes', 'quantity', 'minQuantity']
+        fields = ['id', 'invID', 'name', 'manufacturer',
+                  'notes', 'quantity', 'minQuantity', 'notices']
 
 
 class ItemBatchSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ItemBatch
         fields = ['item', 'expiryDate', 'quantity']

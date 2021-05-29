@@ -1,5 +1,6 @@
 from django.db.models import query
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from .models import Lab, LabInvite, Inventory, Item, ItemBatch, ItemNotices, ItemOrder, ItemActivityLog
 from .serializers import UserSerializer, RegisterUserSerializer, LabSerializer, LabInviteSerializer, InventorySerializer, ItemSerializer, ItemBatchSerializer, ItemNoticesSerializer, ItemOrderSerializer, ItemActivityLogSerializer
 from rest_framework import generics, permissions, serializers
@@ -22,9 +23,16 @@ def api_registration_view(request):
 # Create your views here.
 
 
+class user_detail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 class lab_list(generics.ListCreateAPIView):
-    queryset = Lab.objects.all()
     serializer_class = LabSerializer
+
+    def get_queryset(self):
+        return Lab.objects.filter(members=self.request.user)
 
 
 class lab_invite_list(generics.ListCreateAPIView):
