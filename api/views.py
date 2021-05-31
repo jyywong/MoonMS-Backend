@@ -44,6 +44,15 @@ class inventory_list(generics.ListCreateAPIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
 
+    def delete(self, request, *args, **kwargs):
+        print(dir(request))
+        print(request.data)
+
+
+class inventory_detail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+
 
 class item_list(generics.ListCreateAPIView):
     queryset = Item.objects.all()

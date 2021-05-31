@@ -51,9 +51,24 @@ class LabSerializer(serializers.ModelSerializer):
 
 
 class LabInviteSerializer(serializers.ModelSerializer):
+    inviteeEmail = serializers.EmailField(write_only=True)
+
     class Meta:
         model = LabInvite
-        fields = ['invitee', 'lab_inviter', 'created_at', 'status']
+        fields = ['inviteeEmail', 'lab_inviter', 'created_at', 'status']
+
+    def create(self, validated_data):
+        print(validated_data['inviteeEmail'])
+        print(User.objects.filter(email=validated_data['inviteeEmail']))
+        print(User.objects.filter(
+            email=validated_data['inviteeEmail']).exists())
+        if User.objects.filter(email=validated_data['inviteeEmail']).exists():
+            print('HELOOOOOOOO')
+            targetUser = User.objects.get(email=validated_data['inviteeEmail'])
+            newLabInvite = LabInvite.objects.create(
+                invitee=targetUser, lab_inviter=validated_data['lab_inviter'], status='Pending')
+            newLabInvite.save()
+            return newLabInvite
 
 
 class InventorySerializer(serializers.ModelSerializer):

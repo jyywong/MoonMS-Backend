@@ -10,6 +10,7 @@ urlpatterns = [
     path('labs', views.lab_list.as_view()),
     path('lab_invites', views.lab_invite_list.as_view()),
     path('inventories', views.inventory_list.as_view()),
+    path('inventory/<int:pk>', views.inventory_detail.as_view()),
     path('items', views.item_list.as_view()),
     path('item_batches', views.item_batch_list.as_view()),
     path('item_notices', views.item_notices_list.as_view()),
