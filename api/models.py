@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 from moonMS import settings
 # Create your models here.
 
@@ -52,11 +53,19 @@ class Item(models.Model):
     name = models.CharField(max_length=255)
     manufacturer = models.CharField(max_length=255)
     notes = models.TextField()
-    quantity = models.IntegerField(blank=True, null=True)
     minQuantity = models.IntegerField()
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
+
+    @property
+    def quantity(self):
+        itemBatches = self.itemBatch.all()
+        totalStock = 0
+        for itemBatch in itemBatches:
+            totalStock += itemBatch.quantity
+        return totalStock
 
 
 class ItemBatch(models.Model):
@@ -64,6 +73,7 @@ class ItemBatch(models.Model):
         Item, on_delete=models.CASCADE, related_name="itemBatch")
     expiryDate = models.DateField()
     quantity = models.IntegerField()
+    history = HistoricalRecords()
 
 
 class ItemNotices(models.Model):

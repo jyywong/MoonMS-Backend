@@ -6,11 +6,18 @@ from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    labs = PrimaryKeyRelatedField(many=True, queryset=Lab.members)
+    labs = PrimaryKeyRelatedField(many=True, queryset=Lab.objects.all())
 
     class Meta:
         model = User
         fields = ['id', 'username', 'labs']
+
+
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -52,23 +59,26 @@ class LabSerializer(serializers.ModelSerializer):
 
 class LabInviteSerializer(serializers.ModelSerializer):
     inviteeEmail = serializers.EmailField(write_only=True)
+    invitee = serializers.ReadOnlyField(source="invitee.id")
 
     class Meta:
         model = LabInvite
-        fields = ['inviteeEmail', 'lab_inviter', 'created_at', 'status']
+        fields = ['invitee', 'inviteeEmail',
+                  'lab_inviter', 'created_at', 'status']
 
+    # TODO: Error handling for nonexistant email
     def create(self, validated_data):
-        print(validated_data['inviteeEmail'])
-        print(User.objects.filter(email=validated_data['inviteeEmail']))
-        print(User.objects.filter(
-            email=validated_data['inviteeEmail']).exists())
+
         if User.objects.filter(email=validated_data['inviteeEmail']).exists():
-            print('HELOOOOOOOO')
             targetUser = User.objects.get(email=validated_data['inviteeEmail'])
             newLabInvite = LabInvite.objects.create(
                 invitee=targetUser, lab_inviter=validated_data['lab_inviter'], status='Pending')
             newLabInvite.save()
             return newLabInvite
+        else:
+
+            raise serializers.ValidationError(
+                'This email does not belong to any user.')
 
 
 class InventorySerializer(serializers.ModelSerializer):
@@ -84,21 +94,24 @@ class InventorySerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     invID = serializers.PrimaryKeyRelatedField(
-        source="inventory", queryset=Item.objects.all())
+        source="inventory", queryset=Inventory.objects.all())
     notices = serializers.PrimaryKeyRelatedField(
         source="itemNotices", many=True, queryset=ItemNotices.objects.all())
+    itemBatches = serializers.PrimaryKeyRelatedField(
+        source="itemBatch", many=True, queryset=ItemBatch.objects.all()
+    )
 
     class Meta:
         model = Item
         fields = ['id', 'invID', 'name', 'manufacturer',
-                  'notes', 'quantity', 'minQuantity', 'notices']
+                  'notes', 'quantity', 'minQuantity', 'notices', 'itemBatches', 'itemOrders']
 
 
 class ItemBatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemBatch
-        fields = ['item', 'expiryDate', 'quantity']
+        fields = ['id', 'item', 'expiryDate', 'quantity']
 
 
 class ItemNoticesSerializer(serializers.ModelSerializer):
@@ -110,7 +123,7 @@ class ItemNoticesSerializer(serializers.ModelSerializer):
 class ItemOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemOrder
-        fields = ['item', 'orderRequester',
+        fields = ['id', 'item', 'orderRequester',
                   'quantityRequired', 'dateNeededBy', 'notes']
 
 
