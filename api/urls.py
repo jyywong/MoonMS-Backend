@@ -21,5 +21,8 @@ urlpatterns = [
     path('item_notices', views.item_notices_list.as_view()),
     path('item_orders', views.item_order_list.as_view()),
     path('item_activity_logs', views.item_activity_log_list.as_view()),
+    path('item_batch_history/<int:pk>', views.history_list.as_view()),
+    path('item_history/<int:pk>', views.item_quantity_history.as_view()),
+    path('item_all_history/<int:pk>', views.item_quantity_history.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

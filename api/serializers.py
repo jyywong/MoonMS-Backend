@@ -54,7 +54,8 @@ class LabSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lab
-        fields = ['id', 'name', 'members', 'description', 'inventories']
+        fields = ['id', 'name', 'members',
+                  'description', 'inventories', 'labItems']
 
 
 class LabInviteSerializer(serializers.ModelSerializer):
@@ -93,6 +94,7 @@ class InventorySerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
+    labID = serializers.ReadOnlyField(source='inventory.lab.id')
     invID = serializers.PrimaryKeyRelatedField(
         source="inventory", queryset=Inventory.objects.all())
     notices = serializers.PrimaryKeyRelatedField(
@@ -103,7 +105,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ['id', 'invID', 'name', 'manufacturer',
+        fields = ['id', 'labID', 'invID', 'name', 'manufacturer',
                   'notes', 'quantity', 'minQuantity', 'notices', 'itemBatches', 'itemOrders']
 
 
@@ -131,3 +133,16 @@ class ItemActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemActivityLog
         fields = ['action', 'item', 'user', 'quantity_changed', 'created_at']
+
+
+class HistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemBatch.history.model
+        fields = '__all__'
+
+
+class ItemHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item.history.model
+        fields = ['id', 'name', 'manufacturer', 'notes', 'quantity', 'minQuantity', 'history_id',
+                  'history_date', 'history_change_reason', 'history_type', 'history_user_id', 'inventory_id']

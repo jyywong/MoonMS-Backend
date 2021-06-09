@@ -2,7 +2,7 @@ from django.db.models import query
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from .models import Lab, LabInvite, Inventory, Item, ItemBatch, ItemNotices, ItemOrder, ItemActivityLog
-from .serializers import UserSerializer, UserListSerializer, RegisterUserSerializer, LabSerializer, LabInviteSerializer, InventorySerializer, ItemSerializer, ItemBatchSerializer, ItemNoticesSerializer, ItemOrderSerializer, ItemActivityLogSerializer
+from .serializers import UserSerializer, UserListSerializer, RegisterUserSerializer, LabSerializer, LabInviteSerializer, InventorySerializer, ItemSerializer, ItemBatchSerializer, ItemNoticesSerializer, ItemOrderSerializer, ItemActivityLogSerializer, HistorySerializer, ItemHistorySerializer
 from rest_framework import generics, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -100,3 +100,17 @@ class item_order_list(generics.ListCreateAPIView):
 class item_activity_log_list(generics.ListCreateAPIView):
     queryset = ItemActivityLog.objects.all()
     serializer_class = ItemActivityLogSerializer
+
+
+class history_list(generics.ListAPIView):
+    serializer_class = HistorySerializer
+
+    def get_queryset(self):
+        return ItemBatch.history.filter(id=self.kwargs['pk'])
+
+
+class item_quantity_history(generics.ListAPIView):
+    serializer_class = ItemHistorySerializer
+
+    def get_queryset(self):
+        return Item.history.filter(id=self.kwargs['pk'])
