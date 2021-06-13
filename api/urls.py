@@ -12,6 +12,7 @@ urlpatterns = [
     path('labs', views.lab_list.as_view()),
     path('lab/<int:pk>', views.lab_detail.as_view()),
     path('lab_invites', views.lab_invite_list.as_view()),
+    path('lab_invite/<int:pk>', views.lab_invite_detail.as_view()),
     path('inventories', views.inventory_list.as_view()),
     path('inventory/<int:pk>', views.inventory_detail.as_view()),
     path('items', views.item_list.as_view()),

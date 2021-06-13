@@ -13,6 +13,9 @@ class Lab(models.Model):
     def __str__(self):
         return self.name
 
+    def addMember(self, member):
+        self.members.add(member)
+
     def removeMember(self, member):
         self.members.remove(member)
 
@@ -46,6 +49,12 @@ class LabInvite(models.Model):
 
     def AcceptInvite(self):
         self.lab_inviter.members.add(self.invitee)
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            if self.status == 'Accepted':
+                self.lab_inviter.addMember(self.invitee)
+        super().save(*args, **kwargs)
 
 
 class Inventory(models.Model):

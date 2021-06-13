@@ -25,6 +25,7 @@ def api_registration_view(request):
 
 class user_list(generics.ListCreateAPIView):
     serializer_class = UserListSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         userLabs = Lab.objects.filter(members=self.request.user)
@@ -36,10 +37,12 @@ class user_list(generics.ListCreateAPIView):
 class user_detail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class lab_list(generics.ListCreateAPIView):
     serializer_class = LabSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Lab.objects.filter(members=self.request.user)
@@ -48,11 +51,21 @@ class lab_list(generics.ListCreateAPIView):
 class lab_detail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LabSerializer
     queryset = Lab.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class lab_invite_list(generics.ListCreateAPIView):
+    serializer_class = LabInviteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return LabInvite.objects.filter(invitee=self.request.user)
+
+
+class lab_invite_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = LabInvite.objects.all()
     serializer_class = LabInviteSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class inventory_list(generics.ListCreateAPIView):
@@ -70,40 +83,48 @@ class inventory_detail(generics.RetrieveUpdateDestroyAPIView):
 class item_list(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_batch_list(generics.ListCreateAPIView):
     queryset = ItemBatch.objects.all()
     serializer_class = ItemBatchSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_batch_detail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ItemBatch.objects.all()
     serializer_class = ItemBatchSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_notices_list(generics.ListCreateAPIView):
     queryset = ItemNotices.objects.all()
     serializer_class = ItemNoticesSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_order_list(generics.ListCreateAPIView):
     queryset = ItemOrder.objects.all()
     serializer_class = ItemOrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class item_activity_log_list(generics.ListCreateAPIView):
     queryset = ItemActivityLog.objects.all()
     serializer_class = ItemActivityLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class history_list(generics.ListAPIView):
     serializer_class = HistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return ItemBatch.history.filter(id=self.kwargs['pk'])
@@ -111,6 +132,7 @@ class history_list(generics.ListAPIView):
 
 class item_quantity_history(generics.ListAPIView):
     serializer_class = ItemHistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Item.history.filter(id=self.kwargs['pk'])

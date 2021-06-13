@@ -61,11 +61,12 @@ class LabSerializer(serializers.ModelSerializer):
 class LabInviteSerializer(serializers.ModelSerializer):
     inviteeEmail = serializers.EmailField(write_only=True)
     invitee = serializers.ReadOnlyField(source="invitee.id")
+    lab = serializers.ReadOnlyField(source="lab_inviter.name")
 
     class Meta:
         model = LabInvite
-        fields = ['invitee', 'inviteeEmail',
-                  'lab_inviter', 'created_at', 'status']
+        fields = ['id', 'invitee', 'inviteeEmail',
+                  'lab_inviter', 'created_at', 'status', 'lab']
 
     # TODO: Error handling for nonexistant email
     def create(self, validated_data):
